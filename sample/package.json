@@ -7,7 +7,7 @@
     "name": "programmer"
   },
   "dependencies": {
-    "edge-js": "^15.5.1",
+    "edge-js": "^24.0.5",
     "express": "^4.17.1"
   }
 }

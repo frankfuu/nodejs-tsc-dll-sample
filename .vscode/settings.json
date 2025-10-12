@@ -1,0 +1,23 @@
+{
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#193312",
+    "titleBar.activeBackground": "#23481A",
+    "titleBar.activeForeground": "#F5FBF4"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.classpath": true,
+    "**/.factorypath": true,
+    "**/.pnpm-store/**": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/app/build": true,
+    "**/dist/**": true,
+    "**/node_modules/": true
+  },
+  "hide-files.files": []
+}
