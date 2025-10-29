@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  nodejs-tsc-server:
+    build: .
+    container_name: nodejs-tsc-server
+    ports:
+      - "8888:8888"
+    volumes:
+      # Mount the current directory to /app in the container for live development
+      - .:/app
+      # Persist node_modules
+      - node_modules:/app/node_modules
+      # Mount the shared volume
+      - devvol:/devvol
+    environment:
+      # You can override these in a .env file or directly here
+      - PORT=8888
+      - PRINTER_IP=${PRINTER_IP:-192.168.8.169}
+      - PRINTER_PORT=${PRINTER_PORT:-9100}
+      - PRINTER_DELAY=${PRINTER_DELAY:-500}
+    restart: unless-stopped
+    # Uncomment below if you need to keep stdin open and allocate a TTY
+    # stdin_open: true
+    # tty: true
+
+volumes:
+  node_modules:
+  devvol:

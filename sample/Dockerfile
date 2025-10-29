@@ -26,3 +26,19 @@ RUN sudo apt update
 RUN sudo apt -q -y install dotnet-sdk-9.0
 
 RUN npm i -g node-gyp
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy application files
+COPY . .
+
+# Expose the port the app runs on
+EXPOSE 8888
+
+# Start the server
+CMD ["node", "server.js"]
