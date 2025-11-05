@@ -55,8 +55,45 @@ const sendcommand_utf8 = loadEdgeMethod("sendcommand_utf8");
 const sendcommand_binary = loadEdgeMethod("sendcommand_binary");
 const windowsfont = loadEdgeMethod("windowsfont");
 
+// Basic Auth Configuration - Modify users here
+const AUTHORIZED_USERS = [
+  { username: "admin", password: "admin123" },
+  { username: "printer", password: "print456" },
+  // Add more users as needed: { username: "user", password: "pass" }
+];
+
+// Basic Auth Middleware
+function basicAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Basic ")) {
+    res.setHeader("WWW-Authenticate", 'Basic realm="API"');
+    return res.status(401).json({ ok: false, error: "Authentication required" });
+  }
+
+  try {
+    const base64Credentials = authHeader.split(" ")[1];
+    const credentials = Buffer.from(base64Credentials, "base64").toString("utf-8");
+    const [username, password] = credentials.split(":");
+
+    const user = AUTHORIZED_USERS.find((u) => u.username === username && u.password === password);
+
+    if (!user) {
+      res.setHeader("WWW-Authenticate", 'Basic realm="API"');
+      return res.status(401).json({ ok: false, error: "Invalid credentials" });
+    }
+
+    // Authentication successful
+    req.user = { username: user.username };
+    next();
+  } catch (err) {
+    res.setHeader("WWW-Authenticate", 'Basic realm="API"');
+    return res.status(401).json({ ok: false, error: "Invalid authentication format" });
+  }
+}
+
 // Simple health/test endpoints
-app.get("/test_get", (req, res) => {
+app.get("/test_get", basicAuth, (req, res) => {
   console.log("GET /test_get called");
   res.json({ ok: true, message: "GET Function Test!!" });
 });
@@ -112,7 +149,7 @@ async function executeCommands(commands, address = DEFAULT_PRINTER, options = {}
 // REST endpoint to accept an array of commands and send them sequentially
 // Content-Type: application/json
 // Body shape: { "commands": ["TEXT ...", {"command": "PRINT 1,1 \r\n"}], "printer": { ... }, "options": { clearBuffer: true, closeDelayMs: 2000 } }
-app.post("/api/print/commands", async (req, res) => {
+app.post("/api/print/commands", basicAuth, async (req, res) => {
   try {
     const { commands, printer, options } = req.body || {};
     const address = printer && typeof printer === "object" ? { ...DEFAULT_PRINTER, ...printer } : DEFAULT_PRINTER;
